@@ -32,29 +32,3 @@ for i in range(0, num_samples):
     print("post{} : dist={:.3f}, {}".format(i+1, dist[i], posts[i]))
 
 print("Best post : {} , dist = {:.3f}".format(dist.index(min(dist))+1, min(dist)))
-つるちゃん (id:tsuruchan_0827) 1年前
-
-« 第1章 準備運動 １章　Pythonで始める機械学習 »
-Featured Articles
-chainerの使い方
-chainerの畳み込みニューラルネットワークで10種類の画像を識別（CIFAR-10）
-中間層はどのぐらいが良いのか...？
-Profile
-Written by tsuruchan.
-
-人工知能の研究をしている大学生。
-機械学習とDeepLearningの勉強中。
-対話システムを作りたいな。
-読者になる 11
-Category
-実践　機械学習システム (6)
-chainer (4)
-DeepLearning (4)
-Kaggle (1)
-Linux (1)
-人工知能セミナー (1)
-前処理 (1)
-言語処理１００ (1)
-Search
-
-記事を検索
