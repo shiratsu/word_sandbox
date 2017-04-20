@@ -1,2 +1,3 @@
 *.txt
 lstm-text-gen.py
+*.model
