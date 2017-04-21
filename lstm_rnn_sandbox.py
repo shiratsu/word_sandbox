@@ -14,6 +14,7 @@ mecab = MeCab.Tagger('mecabrc')
 step = 3
 sentences = []
 nextWords = []
+aryWord = []
 
 word2id = {}
 id2word = {}
@@ -62,8 +63,20 @@ def tokenize(text):
 
 # 時系列になるようにワードを作成
 def makeHistoryWords():
-    print(aryWord)
+    # print(aryWord)
+
+    for i in range(0, len(aryWord)):
+        if i+1 < len(aryWord):
+            sentences.append(aryWord[i])
+            nextWords.append(aryWord[i+1])
+    print(nextWords)
+    print("-----------------------------")
+    print(sentences[4])
+    print(nextWords[4])
+    
+
 
 if __name__ == '__main__':
     argvs = sys.argv  # コマンドライン引数を格納したリストの取得
     get_words(argvs[1])
+    makeHistoryWords()
