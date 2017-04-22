@@ -12,6 +12,7 @@ import sys # モジュール属性 argv を取得するため
 mecab = MeCab.Tagger('mecabrc')
 
 step = 3
+maxlen = 20
 sentences = []
 nextWords = []
 aryWord = []
@@ -73,10 +74,17 @@ def makeHistoryWords():
     print("-----------------------------")
     print(sentences[4])
     print(nextWords[4])
-    
+
+# テキストIDをベクトルにします。
+def makeVectol():
 
 
 if __name__ == '__main__':
     argvs = sys.argv  # コマンドライン引数を格納したリストの取得
     get_words(argvs[1])
     makeHistoryWords()
+
+    # ベクトルを作成
+    print('テキストをIDベクトルにします...')
+    X = np.zeros((len(sentences), maxlen, len(aryWord)), dtype=np.bool)
+    y = np.zeros((len(sentences), len(aryWord)), dtype=np.bool)
