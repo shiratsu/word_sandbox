@@ -1,10 +1,9 @@
 # coding: UTF-8
 
-from keras.models import Sequential
-from keras.layers import Dense, Activation, Dropout
-from keras.layers import LSTM
-from keras.optimizers import RMSprop
-from keras.utils.data_utils import get_file
+import numpy as np
+from chainer import cuda, Variable, FunctionSet, optimizers
+import chainer.functions as F
+from CharRNN import CharRNN, make_initial_state
 import numpy as np
 import random, sys
 import MeCab
@@ -19,6 +18,8 @@ aryWord = []
 
 word2id = {}
 id2word = {}
+
+model = Sequential()
 
 def get_words(strFile):
     '''
@@ -40,6 +41,22 @@ def get_words(strFile):
         # aryWord.append(get_words_main(line))
         get_words_main(line)
 
+# input data
+def makeDataSet():
+
+    words = list(aryWord)
+    dataset = np.ndarray((len(words),), dtype=np.int32)
+    for i, word in enumerate(words):
+        if word not in vocab:
+            vocab[word] = len(vocab)
+        dataset[i] = vocab[word]
+    # print("-----------word--------")
+    # print(words)
+    print("-----------vocab--------")
+    print(vocab)
+    print('corpus length:', len(words))
+    print('vocab size:', len(vocab))
+    return dataset, words, vocab
 
 def get_words_main(content):
     '''
@@ -75,16 +92,7 @@ def makeHistoryWords():
     print(sentences[4])
     print(nextWords[4])
 
-# テキストIDをベクトルにします。
-def makeVectol():
-
 
 if __name__ == '__main__':
     argvs = sys.argv  # コマンドライン引数を格納したリストの取得
     get_words(argvs[1])
-    makeHistoryWords()
-
-    # ベクトルを作成
-    print('テキストをIDベクトルにします...')
-    X = np.zeros((len(sentences), maxlen, len(aryWord)), dtype=np.bool)
-    y = np.zeros((len(sentences), len(aryWord)), dtype=np.bool)
