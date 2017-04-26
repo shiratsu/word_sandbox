@@ -131,3 +131,15 @@ if __name__ == '__main__':
 
     optimizer = optimizers.RMSprop(lr=args.learning_rate, alpha=args.decay_rate, eps=1e-8)
     optimizer.setup(model)
+
+    if len(args.init_from) > 0:
+        model = pickle.load(open(args.init_from, 'rb'))
+    else:
+        model = CharRNN(len(vocab), n_units)
+
+    if args.gpu >= 0:
+        cuda.get_device(args.gpu).use()
+        model.to_gpu()
+
+    optimizer = optimizers.RMSprop(lr=args.learning_rate, alpha=args.decay_rate, eps=1e-8)
+    optimizer.setup(model)
