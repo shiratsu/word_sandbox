@@ -45,15 +45,7 @@ def makeDicForFiles(files,dicname):
 
 # 配列作成
 def makeAryWord(line):
-    # result = mecab.parse(line)
-    # word = result[1:]
-    # aryWord.append(word)
-    #
-    # node = mecab.parseToNode(text)
-    # while node:
-    #     if node.feature.split(',')[0] == '名詞':
-    #         yield node.surface.lower()
-    #     node = node.next
+    
     for token in tokenize(line):
         aryWord.append(token)
 

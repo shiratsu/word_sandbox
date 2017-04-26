@@ -3,8 +3,11 @@ import tensorflow
 import sys # モジュール属性 argv を取得するため
 import MeCab
 import gensim
+from makeDicForFiles import makedicDocVec
 
 mecab = MeCab.Tagger('mecabrc')
+
+model = Word2Vec.load("livedoor_wordmodel.model")
 
 # テキストファイルがあるディレクトリ
 dir_dic = [
@@ -22,12 +25,6 @@ dir_dic = [
 # 文書ごとのベクトルを作成
 dicDocVec = {}
 
-# 辞書作成
-def makedicDocVec():
-
-    for dicname in dir_dic:
-        files = os.listdir(dicname)
-        makeDicForFiles(files,dicname)
 
 # 辞書作成
 def makeDicForFiles(files,dicname):
@@ -42,6 +39,18 @@ def makeDicForFiles(files,dicname):
 
         f.close
 
-def makeDic(line):
-    result = mecab.parse(line)
-    word = result[1:]
+# 配列作成
+def makeAryWord(line):
+
+    for token in tokenize(line):
+        # ベクトルが必要や
+        aryWord.append(model.wv[token])
+
+
+def tokenize(text):
+    '''
+    とりあえず形態素解析して名詞だけ取り出す感じにしてる
+    '''
+    node = mecab.parseToNode(text)
+    while node:
+        node = node.next
