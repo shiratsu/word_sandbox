@@ -1,10 +1,13 @@
 # coding: UTF-8
-import tensorflow
-import sys # モジュール属性 argv を取得するため
-import MeCab
+#
+# このファイルはまずモデルを作る
+# このモデルを元に本データがどっちに分類されるのか予測する
+#
 import gensim
+import MeCab
 
 mecab = MeCab.Tagger('mecabrc')
+aryWord = []
 
 # テキストファイルがあるディレクトリ
 dir_dic = [
@@ -18,9 +21,6 @@ dir_dic = [
     "sports-watch",
     "topic-news",
 ]
-
-# 文書ごとのベクトルを作成
-dicDocVec = {}
 
 # 辞書作成
 def makedicDocVec():
@@ -36,12 +36,18 @@ def makeDicForFiles(files,dicname):
         line = f.readline() # 1行を文字列として読み込む(改行文字も含まれる)
 
         while line:
-            print line
-            result = mecab.parse(line)
+            makeAryWord(line)
             line = f.readline()
 
         f.close
 
-def makeDic(line):
+# 配列作成
+def makeAryWord(line):
     result = mecab.parse(line)
     word = result[1:]
+    aryWord.append(word)
+
+
+# モデルを作成して保存
+model = Word2Vec(aryWord)
+model.save("livedoor_wordmodel.model")

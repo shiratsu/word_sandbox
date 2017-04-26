@@ -123,7 +123,7 @@ if __name__ == '__main__':
     bprop_len   = args.seq_length
     grad_clip   = args.grad_clip
 
-    train_data, words, vocab = load_data(args)
+    train_data, words, vocab = makeDataSet()
     pickle.dump(vocab, open('data/vocab.bin', 'wb'))
     if args.gpu >= 0:
         cuda.get_device(args.gpu).use()
@@ -143,3 +143,70 @@ if __name__ == '__main__':
 
     optimizer = optimizers.RMSprop(lr=args.learning_rate, alpha=args.decay_rate, eps=1e-8)
     optimizer.setup(model)
+
+    whole_len    = train_data.shape[0]
+    jump         = whole_len / batchsize
+    epoch        = 0
+    start_at     = time.time()
+    cur_at       = start_at
+    state        = make_initial_state(n_units, batchsize=batchsize)
+    if args.gpu >= 0:
+        accum_loss   = Variable(cuda.zeros(()))
+        for key, value in state.items():
+            value.data = cuda.to_gpu(value.data)
+    else:
+        accum_loss   = Variable(np.zeros((), dtype=np.float32))
+
+    print('going to train {} iterations'.format(jump * n_epochs))
+    # print(train_data)
+    # print(batchsize)
+    for i in range(int(jump * n_epochs)):
+
+        # for j in range(batchsize):
+        #     print(train_data[int((jump * j + i) % whole_len]))
+
+        # ある言葉の次に何が来るかを推測するために、yは次のindexを指定
+        x_batch = np.array([train_data[int((jump * j + i) % whole_len)]
+                            for j in range(batchsize)])
+        y_batch = np.array([train_data[int((jump * j + i + 1) % whole_len)]
+                            for j in range(batchsize)])
+
+        if args.gpu >=0:
+            x_batch = cuda.to_gpu(x_batch)
+            y_batch = cuda.to_gpu(y_batch)
+
+        state, loss_i = model.forward_one_step(x_batch, y_batch, state, dropout_ratio=args.dropout)
+        accum_loss   += loss_i
+
+        if (i + 1) % bprop_len == 0:  # Run truncated BPTT
+            now = time.time()
+            print('{}/{}, train_loss = {}, time = {:.2f}'.format((i+1)/bprop_len, jump, accum_loss.data / bprop_len, now-cur_at))
+            cur_at = now
+
+            optimizer.zero_grads()
+            accum_loss.backward()
+            accum_loss.unchain_backward()  # truncate
+            if args.gpu >= 0:
+                accum_loss = Variable(cuda.zeros(()))
+            else:
+                accum_loss = Variable(np.zeros((), dtype=np.float32))
+
+            optimizer.clip_grads(grad_clip)
+            optimizer.update()
+
+        if (i + 1) % 10000 == 0:
+            # モデルの情報をファイルに書き込んでいる
+            # トレーニング結果を別で利用するため
+            # これをすれば毎回トレーニングさせてから、文章作らせる必要ないね
+            fn = ('%s/charrnn_epoch_%.2f.chainermodel' % (args.checkpoint_dir, float(i)/jump))
+            pickle.dump(copy.deepcopy(model).to_cpu(), open(fn, 'wb'))
+            pickle.dump(copy.deepcopy(model).to_cpu(), open('%s/latest.chainermodel'%(args.checkpoint_dir), 'wb'))
+
+        if (i + 1) % jump == 0:
+            epoch += 1
+
+            if epoch >= args.learning_rate_decay_after:
+                optimizer.lr *= args.learning_rate_decay
+                print('decayed learning rate by a factor {} to {}'.format(args.learning_rate_decay, optimizer.lr))
+
+        sys.stdout.flush()
