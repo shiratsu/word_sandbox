@@ -5,6 +5,7 @@
 #
 import gensim
 import MeCab
+import os
 
 mecab = MeCab.Tagger('mecabrc')
 aryLine = []
@@ -26,13 +27,13 @@ dir_dic = [
 def makedicDocVec():
 
     for dicname in dir_dic:
-        files = os.listdir(dicname)
+        files = os.listdir('formakemodel/livedoor/'+dicname)
         makeDicForFiles(files,dicname)
 
 # 辞書作成
 def makeDicForFiles(files,dicname):
     for file in files:
-        f = open(dicname+'/'+file)
+        f = open('formakemodel/livedoor/'+dicname+'/'+file,encoding='utf-8', errors='ignore')
         line = f.readline() # 1行を文字列として読み込む(改行文字も含まれる)
 
         while line:
@@ -45,7 +46,7 @@ def makeDicForFiles(files,dicname):
 
 # 配列作成
 def makeAryWord(line):
-    
+
     for token in tokenize(line):
         aryWord.append(token)
 
@@ -56,6 +57,9 @@ def tokenize(text):
     node = mecab.parseToNode(text)
     while node:
         node = node.next
+
+
+makedicDocVec()
 
 # モデルを作成して保存
 model = Word2Vec(aryWord)
