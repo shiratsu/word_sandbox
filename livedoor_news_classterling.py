@@ -43,8 +43,9 @@ def makeDicForFiles(files,dicname):
 def makeAryWord(line):
 
     for token in tokenize(line):
-        # ベクトルが必要や
-        aryWord.append(model.wv[token])
+        if token != None:
+            # ベクトルが必要や
+            aryWord.append(model.wv[token])
 
 
 def tokenize(text):
