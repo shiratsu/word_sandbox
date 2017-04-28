@@ -35,15 +35,15 @@ def makeDicForFiles(files,dicname):
     for file in files:
         if not file.startswith('.'):
             f = open('formakemodel/livedoor/'+dicname+'/'+file,encoding='utf-8', errors='ignore')
-        line = f.readline() # 1行を文字列として読み込む(改行文字も含まれる)
+            line = f.readline() # 1行を文字列として読み込む(改行文字も含まれる)
 
-        while line:
-            makeAryWord(line)
-            # aryLine.append(aryWord)
-            line = f.readline()
-            # aryWord = []
+            while line:
+                makeAryWord(line)
+                # aryLine.append(aryWord)
+                line = f.readline()
+                # aryWord = []
 
-        f.close
+            f.close
 
 # 配列作成
 def makeAryWord(line):
