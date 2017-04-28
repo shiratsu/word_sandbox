@@ -72,5 +72,5 @@ def tokenize(text):
 makedicDocVec()
 
 # モデルを作成して保存
-model = Word2Vec(aryWord)
+model = gensim.models.Word2Vec(aryWord)
 model.save("livedoor_wordmodel.model")
